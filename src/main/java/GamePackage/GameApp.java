@@ -4,15 +4,18 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.SpawnData;
+import com.almasb.fxgl.scene3d.Model3D;
 import javafx.geometry.Point3D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import com.almasb.fxgl.entity.Entity;
-
 import java.util.Map;
-
+import javafx.scene.shape.MeshView;
+import com.almasb.fxgl.entity.components.ViewComponent;
+import com.almasb.fxgl.entity.components.TransformComponent;
 
 public class GameApp extends GameApplication {
 
@@ -57,6 +60,12 @@ public class GameApp extends GameApplication {
     @Override
     protected void initGame(){
 
+        Model3D model = FXGL.getAssetLoader().loadModel3D("Grenade.obj");
+
+        model.setScaleX(5);
+        model.setScaleY(5);
+        model.setScaleZ(5);
+
         var camera = FXGL.getGameScene().getCamera3D();
         camera.getTransform().translateX(5);
         camera.getTransform().translateY(-10);
@@ -68,6 +77,12 @@ public class GameApp extends GameApplication {
         camera.getTransform().lookAt(ground.getPosition3D());
 
         platform = FXGL.spawn("platform", 0, 1, 0);
+
+        SpawnData model_data = new SpawnData(0,3,0);
+        FXGL.entityBuilder(model_data)
+                .view(model)
+                .rotate(180)
+                .buildAndAttach();
 
         //Spawn: x and y are in pixels at our screen (Default: Middle of the Screen)
         FXGL.run(() -> {

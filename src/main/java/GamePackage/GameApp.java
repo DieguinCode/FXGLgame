@@ -13,13 +13,13 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import com.almasb.fxgl.entity.Entity;
 import java.util.Map;
-import javafx.scene.shape.MeshView;
-import com.almasb.fxgl.entity.components.ViewComponent;
-import com.almasb.fxgl.entity.components.TransformComponent;
+import javafx.scene.transform.Rotate;
+
 
 public class GameApp extends GameApplication {
 
     private Entity platform;
+    private javafx.scene.text.Text fpsText;
 
     @Override
     protected void initSettings(GameSettings gameSettings) {
@@ -60,11 +60,11 @@ public class GameApp extends GameApplication {
     @Override
     protected void initGame(){
 
-        Model3D model = FXGL.getAssetLoader().loadModel3D("Grenade.obj");
+        Model3D model = FXGL.getAssetLoader().loadModel3D("uploads_files_4176475_Polina-final.obj");
 
-        model.setScaleX(5);
-        model.setScaleY(5);
-        model.setScaleZ(5);
+        model.setScaleX(100);
+        model.setScaleY(100);
+        model.setScaleZ(100);
 
         var camera = FXGL.getGameScene().getCamera3D();
         camera.getTransform().translateX(5);
@@ -78,11 +78,18 @@ public class GameApp extends GameApplication {
 
         platform = FXGL.spawn("platform", 0, 1, 0);
 
-        SpawnData model_data = new SpawnData(0,3,0);
-        FXGL.entityBuilder(model_data)
+        Rotate rotateY = new Rotate();
+        rotateY.setAxis(Rotate.Y_AXIS);
+        rotateY.setAngle(180);
+
+        SpawnData model_data = new SpawnData(0,1,+4);
+        Entity model_entity = FXGL.entityBuilder(model_data)
                 .view(model)
                 .rotate(180)
-                .buildAndAttach();
+                .build();
+
+        model_entity.getViewComponent().getParent().getTransforms().add(rotateY);
+        FXGL.getGameWorld().addEntity(model_entity);
 
         //Spawn: x and y are in pixels at our screen (Default: Middle of the Screen)
         FXGL.run(() -> {
@@ -113,6 +120,15 @@ public class GameApp extends GameApplication {
         scoreText.textProperty().bind(FXGL.getip("score").asString("Score: %d"));
 
         FXGL.addUINode(scoreText, 50, 50);
+
+        fpsText = FXGL.getUIFactoryService().newText("", Color.DARKRED, 14);
+        FXGL.addUINode(fpsText, 50, 65);
+    }
+
+    @Override
+    protected void onUpdate(double tpf){
+        var number = (1.0 / FXGL.tpf());
+        fpsText.setText(String.format("FPS: %d", (int) number));
     }
 
     public static void main(String[] args){
